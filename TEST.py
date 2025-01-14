@@ -29,13 +29,13 @@ def write_out(x , y , filename , mode='a'):
 
 ##########################################
 #number of networks I wish to consider
-pop_size = 200
+pop_size = 400
 ##########################################
 ##########################################
 #network parameters
 ##########################################
 # number of nodes
-n = 10
+n = 20
 # each node is joined with its m nearest neighbours in a ring topology
 m = 2
 # probability of edge rewiring
@@ -134,6 +134,9 @@ else:
 
 # If we find target network in initial population then run the following line of code
 np.array([np.sum(np.real(adjacency_matrix_target()[0]))/2 , np.sum(np.real(found_it[0]))/2])
+adjacency_matrix_target()[0] == found_it[0]
+alt_Frozen_Network_class(found_it[0] , target_data() , ts).calculate_distance()
+
 
 new_pop = Genetic_Evolution(fit_half(alt_genetic_distance(population)[1]) , alt_distances[0][:len(alt_distances[0])//2]).new_population()
 
@@ -168,8 +171,18 @@ for j in tqdm(range(100)):
         new_distances, new_pop = alt_genetic_distance(new_pop)
     else:
         new_distances, new_population = alt_genetic_distance(new_pop , start_index = pop_size // 4)
-        new_distances = sorted(distances[-1][:pop_size // 4] + new_distances)
-        new_pop = new_pop[:pop_size//4] + new_population
+        # new_distances = sorted(distances[-1][:pop_size // 4] + new_distances)
+        # new_pop = new_pop[:pop_size//4] + new_population
+
+        # Combine distances and population from current and new generations
+        combined = list(zip(distances[-1][:pop_size // 4] + new_distances, new_pop[:pop_size // 4] + new_population))
+        # Sort by distances
+        combined.sort(key=lambda x: x[0])
+        # Unpack sorted distances and population
+        new_distances, new_pop = zip(*combined)
+        # Convert to lists (if needed)
+        new_distances = list(new_distances)
+        new_pop = list(new_pop)
 
     distances.append(new_distances)
     best_individual.append(new_pop[0])
@@ -233,37 +246,7 @@ else:
 
 
 alt_Frozen_Network_class(best_individual[len(best_individual) - 1] , target_data() , ts).calculate_distance()
-
-
-# Investigating the physical topologies of the target network and the best individual
-nx.draw(target , with_labels = True)
-plt.show()
-nx.draw(nx.from_numpy_array(np.real(best_individual[len(best_individual) - 1])) , with_labels = True)
-plt.show()
-
-# finding the connections related to the component the excitation is initially injected into
-nx.node_connected_component(target , 1)
-nx.node_connected_component(nx.from_numpy_array(np.real(best_individual[len(best_individual) - 1])) , 1)
-
-# which adjacency matrix elements differ between the target and fittest indiviudal
-arr = adjacency_matrix_target()[0] == best_individual[len(best_individual) - 1]
-# Count the number of False values
-false_count = np.sum(arr == False) // 2
-# Print the result
-print(f'The number of False values for the fittest individual is: {false_count}')
-
-# is the fittest individual an isomorphism of the target matrix?
-nx.is_isomorphic(target , nx.from_numpy_array(np.real(best_individual[len(best_individual) - 1])))
-
-# WL graph isomorphism test
-nx.weisfeiler_lehman_graph_hash(target)
-nx.weisfeiler_lehman_graph_hash(nx.from_numpy_array(np.real(best_individual[len(best_individual) - 1])))
-
-# measuring the similarity between two graphs through graph_edit_distance
-nx.graph_edit_distance(target , nx.from_numpy_array(np.real(best_individual[len(best_individual) - 1])))
-
-
-
+alt_Frozen_Network_class(new_pop[0] , target_data() , ts).calculate_distance()
 
 
 #  RELABELLNIG MAP
