@@ -35,7 +35,7 @@ pop_size = 400
 #network parameters
 ##########################################
 # number of nodes
-n = 20
+n = 10
 # each node is joined with its m nearest neighbours in a ring topology
 m = 2
 # probability of edge rewiring
