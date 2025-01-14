@@ -1,0 +1,14 @@
+# Building a genetic algorithm for an Erdos-Renyi network
+
+# Each individual is a specific network topology, for instance
+# the output of 'nx.erdos_renyi_graph(34 , 0.25)' is one individual,
+# and for each individual we have a set of parameters that represent the edges
+# i.e. the connections between the nodes.
+
+# The fitness function is the fidelity between an unknown network
+# and our current individual.
+# Once the fidelity crosses a certain threshold, then we deem our function evaluated,
+# at which stage we will have obtained the optimal solution.
+
+# However,
+# we must consider the 
